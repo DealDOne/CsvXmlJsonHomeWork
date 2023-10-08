@@ -30,38 +30,23 @@ public class XmlToJSon {
         } return null;
     }
 
-    private static List<HashMap<String,String>> read(Node node, int employeesNumbers, List<HashMap<String,String>> list){
-        for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-            Node nodeItem = node.getChildNodes().item(i);
-            if (nodeItem.ELEMENT_NODE == nodeItem.getNodeType()){
-                if (nodeItem.getChildNodes().getLength() != 1) {
-                    list.add(new HashMap<>());
-                    employeesNumbers += 1;
-                }
-                else if (nodeItem.getAttributes() != null){
-                    NamedNodeMap map = nodeItem.getAttributes();
-                    for (int j = 0; j < map.getLength(); j++){
-                    }
-                }
-                read(nodeItem, employeesNumbers, list);
-            } else if (node.getChildNodes().getLength() == 1){
-
-                String key = node.getNodeName();
-                String value = nodeItem.getNodeValue();
-
-                list.get(employeesNumbers - 1).put(key, value);
-
-            }
-        } return list;
-    }
-
     public static List<Employee> parseXML(String file){
         Node node = getRoot(file);
-        List<HashMap<String,String>> list = new ArrayList<>();
+        NodeList nodeList = node.getChildNodes();
         List<Employee> employees = new ArrayList<>();
-        for (HashMap<String,String> map: read(node, 0, list)){
-            Employee employee = new Employee(Integer. parseInt(map.get("id")), map.get("firstName"), map.get("lastName"), map.get("country"), Integer. parseInt(map.get("age")));
-            employees.add(employee);
-            } return employees;
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node nodeItem = node.getChildNodes().item(i);
+            if (nodeItem.ELEMENT_NODE == nodeItem.getNodeType() && nodeItem.getNodeName() == "employee"){
+                Element element = (Element) nodeItem;
+                int id = Integer. parseInt(element.getElementsByTagName("id").item(0).getTextContent());
+                String firstName = element.getElementsByTagName("firstName").item(0).getTextContent();
+                String lastName = element.getElementsByTagName("lastName").item(0).getTextContent();
+                String country = element.getElementsByTagName("country").item(0).getTextContent();
+                int age =  Integer. parseInt(element.getElementsByTagName("age").item(0).getTextContent());
+                Employee employee = new Employee(id, firstName, lastName, country, age);
+                employees.add(employee);
+            }
         }
+        return employees;
+    }
 }
